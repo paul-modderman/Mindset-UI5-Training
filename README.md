@@ -15,14 +15,14 @@ Collection of code and setup info for UI5 training by Mindset
 If you're in class, we'll do this together as well. Play-at-home: follow along here. 
 
 ### ABAP ###
-1. Set up a simple plant DDIC structure. 
++ Set up a simple plant DDIC structure. 
 
 ![alt text](https://link.to/my.picture "title text")
 
-2. Set up a maintenance request DDIC structure. 
++ Set up a maintenance request DDIC structure. 
 
 ![alt text](https://link.to/my.other.picture "title text")
 
-3. Create a project in SEGW. 
-4. Import the plant DDIC structure into an entity/entityset called Plant/PlantSet. 
-5. Import the maintenance request DDIC structure into an entity/entityset called MaintRequest/MaintRequestSet. 
++ Create a project in SEGW. 
++ Import the plant DDIC structure into an entity/entityset called Plant/PlantSet. 
++ Import the maintenance request DDIC structure into an entity/entityset called MaintRequest/MaintRequestSet. 
