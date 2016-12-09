@@ -16,9 +16,11 @@ If you're in class, we'll do this together as well. Play-at-home: follow along h
 
 ### ABAP ###
 1. Set up a simple plant DDIC structure. 
+
 ![alt text](https://link.to/my.picture "title text")
 
 2. Set up a maintenance request DDIC structure. 
+
 ![alt text](https://link.to/my.other.picture "title text")
 
 3. Create a project in SEGW. 
