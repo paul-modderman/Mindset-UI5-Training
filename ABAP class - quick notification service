@@ -1,0 +1,584 @@
+class ZCL_ZNOTIFICATION_DEMO_DPC_EXT definition
+  public
+  inheriting from ZCL_ZNOTIFICATION_DEMO_DPC
+  create public .
+
+public section.
+protected section.
+
+  methods EQUIPMENTSET_GET_ENTITYSET
+    redefinition .
+  methods FUNCTIONALLOCSET_GET_ENTITYSET
+    redefinition .
+  methods MAINTREQUESTSET_CREATE_ENTITY
+    redefinition .
+  methods MAINTREQUESTSET_GET_ENTITYSET
+    redefinition .
+  methods MAINTREQUESTSET_UPDATE_ENTITY
+    redefinition .
+  methods PLANTSET_GET_ENTITY
+    redefinition .
+  methods PLANTSET_GET_ENTITYSET
+    redefinition .
+  methods MAINTREQUESTSET_GET_ENTITY
+    redefinition .
+private section.
+
+  methods ALM_STRING_FORMAT
+    importing
+      !IM_STRING type STRING
+    returning
+      value(RT_TLINE) type BAPI_ALM_TEXT_LINES_T .
+ENDCLASS.
+
+
+
+CLASS ZCL_ZNOTIFICATION_DEMO_DPC_EXT IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->ALM_STRING_FORMAT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IM_STRING                      TYPE        STRING
+* | [<-()] RT_TLINE                       TYPE        BAPI_ALM_TEXT_LINES_T
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD alm_string_format.
+
+    DATA lv_longtext(2000) type c.
+    DATA lt_tline TYPE TABLE OF tline.
+    DATA lt_outtext TYPE TABLE OF tdline.
+    DATA lv_len TYPE i VALUE 132.
+
+    lv_longtext = im_string.
+
+    CALL FUNCTION 'RKD_WORD_WRAP'
+      EXPORTING
+        textline = lv_longtext
+        outputlen = lv_len
+      TABLES
+        out_lines = lt_outtext.
+    IF sy-subrc IS NOT INITIAL.
+      RETURN.
+    ENDIF.
+
+    CALL FUNCTION 'CONVERT_STREAM_TO_ITF_TEXT'
+      EXPORTING
+        lf = cl_abap_char_utilities=>newline
+      TABLES
+        text_stream = lt_outtext
+        itf_text = lt_tline.
+
+    rt_tline[] = lt_tline[].
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->EQUIPMENTSET_GET_ENTITYSET
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_FILTER_SELECT_OPTIONS       TYPE        /IWBEP/T_MGW_SELECT_OPTION
+* | [--->] IS_PAGING                      TYPE        /IWBEP/S_MGW_PAGING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IT_ORDER                       TYPE        /IWBEP/T_MGW_SORTING_ORDER
+* | [--->] IV_FILTER_STRING               TYPE        STRING
+* | [--->] IV_SEARCH_STRING               TYPE        STRING
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITYSET(optional)
+* | [<---] ET_ENTITYSET                   TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TT_EQUIPMENT
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD equipmentset_get_entityset.
+    DATA lt_planplant_ra TYPE TABLE OF bapi_itob_sel_planplant.
+    DATA lt_equipment_list TYPE TABLE OF bapi_itob_eq_sel_result.
+
+    LOOP AT lt_planplant_ra INTO DATA(ls_planplant_ra).
+      ls_planplant_ra-sign = 'I'.
+      ls_planplant_ra-option = 'EQ'.
+      ls_planplant_ra-low = '1000'.
+      APPEND ls_planplant_ra TO lt_planplant_ra.
+    ENDLOOP.
+
+    CALL FUNCTION 'BAPI_EQUI_GETLIST'
+      EXPORTING
+        language       = sy-langu
+      TABLES
+        planplant_ra   = lt_planplant_ra
+        equipment_list = lt_equipment_list.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->FUNCTIONALLOCSET_GET_ENTITYSET
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_FILTER_SELECT_OPTIONS       TYPE        /IWBEP/T_MGW_SELECT_OPTION
+* | [--->] IS_PAGING                      TYPE        /IWBEP/S_MGW_PAGING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IT_ORDER                       TYPE        /IWBEP/T_MGW_SORTING_ORDER
+* | [--->] IV_FILTER_STRING               TYPE        STRING
+* | [--->] IV_SEARCH_STRING               TYPE        STRING
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITYSET(optional)
+* | [<---] ET_ENTITYSET                   TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TT_FUNCTIONALLOC
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD functionallocset_get_entityset.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->MAINTREQUESTSET_CREATE_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY_C(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IO_DATA_PROVIDER               TYPE REF TO /IWBEP/IF_MGW_ENTRY_PROVIDER(optional)
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TS_MAINTREQUEST
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD maintrequestset_create_entity.
+    DATA lv_bapi_msg TYPE bapi_msg.
+    DATA lv_timestamp TYPE timestampl.
+    DATA lt_tline TYPE TABLE OF tline.
+    DATA ls_tline LIKE LINE OF lt_tline.
+    DATA lv_timezone TYPE ttzz-tzone.
+    DATA lv_longtext TYPE string.
+    DATA lv_err TYPE c.
+    DATA lt_return TYPE bapiret2_t.
+    "DATA ls_return LIKE LINE OF lt_return.
+    DATA ls_header TYPE bapi2080_nothdri.
+    DATA ls_header_ex TYPE bapi2080_nothdre.
+
+    CONSTANTS lc_err TYPE c VALUE 'E'.
+    CONSTANTS lv_type TYPE bapi2080-notif_type VALUE 'M1'.
+
+    io_data_provider->read_entry_data( IMPORTING es_data = er_entity ).
+
+    GET TIME STAMP FIELD lv_timestamp.
+
+    MOVE-CORRESPONDING er_entity TO ls_header.
+    CONVERT TIME STAMP lv_timestamp TIME ZONE lv_timezone
+      INTO DATE ls_header-strmlfndate.
+    CONVERT TIME STAMP lv_timestamp TIME ZONE lv_timezone
+      INTO TIME ls_header-strmlfntime.
+
+    CALL FUNCTION 'BAPI_ALM_NOTIF_CREATE'
+      EXPORTING
+        notif_type = lv_type
+        notifheader = ls_header
+      IMPORTING
+        notifheader_export = ls_header_ex
+      TABLES
+        return = lt_return.
+
+    READ TABLE lt_return INTO DATA(ls_return)
+      WITH KEY type = lc_err.
+    IF sy-subrc IS NOT INITIAL.
+      "handle error
+    ENDIF.
+
+    IF er_entity-long_text IS NOT INITIAL.
+      lv_longtext = er_entity-long_text.
+      lt_tline = me->alm_string_format( im_string = lv_longtext ).
+
+      CALL FUNCTION 'IQS0_ADD_NOTIFICATION_LONGTEXT'
+        EXPORTING
+          i_qmnum = ls_header_ex-notif_no
+        TABLES
+          t_inlines = lt_tline.
+    ENDIF.
+
+    CALL FUNCTION 'BAPI_ALM_NOTIF_SAVE'
+      EXPORTING
+        number = ls_header_ex-notif_no
+      IMPORTING
+        notifheader = ls_header_ex.
+
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+      EXPORTING
+        wait = abap_true.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->MAINTREQUESTSET_GET_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_REQUEST_OBJECT              TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TS_MAINTREQUEST
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD maintrequestset_get_entity.
+    DATA lv_qmnum TYPE viqmel-qmnum.
+    DATA ls_viqmel TYPE viqmel.
+
+    READ TABLE it_key_tab INTO DATA(ls_key_tab) INDEX 1.
+    IF sy-subrc IS INITIAL.
+      lv_qmnum = ls_key_tab-value.
+      SELECT SINGLE
+             qmnum equnr tplnr qmtxt priok
+             mzeit qmdat qmnam msaus swerk
+             iwerk ingrp qmcod ausvn auztv
+             ernam objnr
+        FROM viqmel
+        INTO CORRESPONDING FIELDS OF ls_viqmel
+       WHERE qmnum = lv_qmnum.
+
+      er_entity-notif_no = ls_viqmel-qmnum.
+      er_entity-equipment = ls_viqmel-equnr.
+      er_entity-planplant = ls_viqmel-iwerk.
+      er_entity-funct_loc = ls_viqmel-tplnr.
+      er_entity-short_text = ls_viqmel-qmtxt.
+      er_entity-priority = ls_viqmel-priok.
+      er_entity-malf_start_timestamp = ls_viqmel-mzeit.
+      er_entity-create_on_ts = ls_viqmel-qmdat.
+      er_entity-reportedby = ls_viqmel-qmnam.
+      er_entity-breakdown = ls_viqmel-msaus.
+      er_entity-maintplant = ls_viqmel-swerk.
+      er_entity-plangroup = ls_viqmel-ingrp.
+      er_entity-coding = ls_viqmel-qmcod.
+      er_entity-ernam = ls_viqmel-ernam.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->MAINTREQUESTSET_GET_ENTITYSET
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_FILTER_SELECT_OPTIONS       TYPE        /IWBEP/T_MGW_SELECT_OPTION
+* | [--->] IS_PAGING                      TYPE        /IWBEP/S_MGW_PAGING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IT_ORDER                       TYPE        /IWBEP/T_MGW_SORTING_ORDER
+* | [--->] IV_FILTER_STRING               TYPE        STRING
+* | [--->] IV_SEARCH_STRING               TYPE        STRING
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITYSET(optional)
+* | [<---] ET_ENTITYSET                   TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TT_MAINTREQUEST
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD maintrequestset_get_entityset.
+    DATA lt_request TYPE TABLE OF viqmel.
+    DATA ls_entity LIKE LINE OF et_entityset.
+    DATA lv_equipment TYPE bapi_itob_parms-equipment.
+    DATA lv_func_loc TYPE bapi_itob_parms-funcloc_int.
+    DATA lv_werks TYPE viqmel-swerk.
+    DATA lt_werks_rng TYPE RANGE OF viqmel-swerk.
+    DATA ls_werks_rng LIKE LINE OF lt_werks_rng.
+    DATA lt_notification TYPE STANDARD TABLE OF bapi2080_1.
+    DATA ls_notification LIKE LINE OF lt_notification.
+    DATA lv_date TYPE sydatum.
+
+    lv_date = sy-datum - 50000. "that's nuts.
+
+    LOOP AT it_filter_select_options INTO DATA(ls_select_options).
+      CASE ls_select_options-property.
+        WHEN 'Equipment'.
+          LOOP AT ls_select_options-select_options INTO DATA(ls_equip_options).
+            lv_equipment = ls_equip_options-low.
+          ENDLOOP.
+        WHEN 'FunctionalLocID'.
+          LOOP AT ls_select_options-select_options INTO DATA(ls_funcloc_options).
+            lv_func_loc = ls_funcloc_options-low.
+          ENDLOOP.
+      ENDCASE.
+    ENDLOOP.
+
+    IF it_navigation_path IS NOT INITIAL.
+      "this means it's being navigated to from somewhere else.
+      READ TABLE it_key_tab INTO DATA(ls_key_tab) WITH KEY name = 'Werks'.
+      IF sy-subrc IS INITIAL.
+        ls_werks_rng-sign = 'I'.
+        ls_werks_rng-option = 'EQ'.
+        ls_werks_rng-low = ls_key_tab-value.
+        APPEND ls_werks_rng TO lt_werks_rng.
+      ENDIF.
+    ENDIF.
+
+    IF lv_equipment IS NOT INITIAL.
+      CALL FUNCTION 'BAPI_ALM_NOTIF_LIST_EQUI'
+        EXPORTING
+          equipment = lv_equipment
+          notification_date = lv_date
+        TABLES
+          notification = lt_notification.
+    ELSEIF lv_func_loc IS NOT INITIAL.
+      CALL FUNCTION 'BAPI_ALM_NOTIF_LIST_FUNCLOC'
+        EXPORTING
+          funcloc = lv_func_loc
+          notification_date = lv_date
+        TABLES
+          notification = lt_notification.
+    ENDIF.
+
+    IF lt_werks_rng IS INITIAL.
+        ls_werks_rng-sign = 'I'.
+        ls_werks_rng-option = 'EQ'.
+        ls_werks_rng-low = '0001'.
+        APPEND ls_werks_rng TO lt_werks_rng.
+
+        ls_werks_rng-sign = 'I'.
+        ls_werks_rng-option = 'EQ'.
+        ls_werks_rng-low = '1300'.
+        APPEND ls_werks_rng TO lt_werks_rng.
+
+        ls_werks_rng-sign = 'I'.
+        ls_werks_rng-option = 'EQ'.
+        ls_werks_rng-low = '5000'.
+        APPEND ls_werks_rng TO lt_werks_rng.
+
+        ls_werks_rng-sign = 'I'.
+        ls_werks_rng-option = 'EQ'.
+        ls_werks_rng-low = 'ZCBM'.
+        APPEND ls_werks_rng TO lt_werks_rng.
+    ENDIF.
+
+    IF lt_notification IS NOT INITIAL.
+      SELECT qmnum equnr tplnr qmtxt priok
+             mzeit qmdat qmnam msaus swerk
+             iwerk ingrp qmcod ausvn auztv
+             ernam objnr
+        FROM viqmel
+        INTO CORRESPONDING FIELDS OF TABLE lt_request
+        FOR ALL ENTRIES IN lt_notification
+       WHERE qmnum = lt_notification-notificat
+         AND swerk IN lt_werks_rng.
+    ELSE.
+      SELECT qmnum equnr tplnr qmtxt priok
+             mzeit qmdat qmnam msaus swerk
+             iwerk ingrp qmcod ausvn auztv
+             ernam objnr
+        FROM viqmel
+        INTO CORRESPONDING FIELDS OF TABLE lt_request
+       WHERE swerk IN lt_werks_rng.
+
+      LOOP AT lt_request INTO DATA(ls_request).
+        CLEAR ls_notification.
+        TRANSLATE ls_request-qmtxt TO UPPER CASE.
+        ls_notification-notificat = ls_request-qmnum.
+        ls_notification-equipment = ls_request-equnr.
+        ls_notification-funcloc = ls_request-tplnr.
+        ls_notification-descript = ls_request-qmtxt.
+        ls_notification-priority = ls_request-priok.
+        APPEND ls_notification TO lt_notification.
+      ENDLOOP.
+    ENDIF.
+
+    LOOP AT lt_notification INTO ls_notification.
+      CLEAR ls_entity.
+      MOVE-CORRESPONDING ls_notification TO ls_entity.
+      ls_entity-notif_no = ls_notification-notificat.
+      ls_entity-funct_loc = ls_notification-funcloc.
+      ls_entity-short_text = ls_notification-descript.
+      ls_entity-eqtxt = ls_notification-equidescr.
+      ls_entity-pltxt = ls_notification-funcldescr.
+      READ TABLE lt_request INTO ls_request WITH KEY
+        qmnum = ls_notification-notificat.
+      IF sy-subrc IS INITIAL.
+        ls_entity-reportedby = ls_request-qmnam.
+        ls_entity-breakdown = ls_request-msaus.
+        ls_entity-maintplant = ls_request-swerk.
+        ls_entity-planplant = ls_request-iwerk.
+        ls_entity-plangroup = ls_request-ingrp.
+        ls_entity-coding = ls_request-qmcod.
+        ls_entity-ernam = ls_request-ernam.
+      ENDIF.
+      APPEND ls_entity TO et_entityset.
+    ENDLOOP.
+
+*    LOOP AT lt_request INTO DATA(ls_request).
+*      CLEAR ls_entity.
+*      ls_entity-notif_no = ls_request-qmnum.
+*      ls_entity-funct_loc = ls_request-
+*    ENDLOOP.
+
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->MAINTREQUESTSET_UPDATE_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY_U(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IO_DATA_PROVIDER               TYPE REF TO /IWBEP/IF_MGW_ENTRY_PROVIDER(optional)
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TS_MAINTREQUEST
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD maintrequestset_update_entity.
+
+    DATA lv_bapi_msg TYPE bapi_msg.
+    DATA lv_timestamp TYPE timestampl.
+    DATA lt_tline TYPE TABLE OF tline.
+    DATA ls_tline LIKE LINE OF lt_tline.
+    DATA lv_timezone TYPE ttzz-tzone.
+    DATA lv_longtext TYPE string.
+    DATA lv_err TYPE c.
+    DATA lt_return TYPE bapiret2_t.
+    "DATA ls_return LIKE LINE OF lt_return.
+    DATA ls_header TYPE bapi2080_nothdri.
+    DATA ls_header_ex TYPE bapi2080_nothdre.
+    DATA ls_header_x TYPE bapi2080_nothdri_x.
+
+    CONSTANTS lc_err TYPE c VALUE 'E'.
+    CONSTANTS lv_type TYPE bapi2080-notif_type VALUE 'M1'.
+
+    io_data_provider->read_entry_data( IMPORTING es_data = er_entity ).
+
+    READ TABLE it_key_tab INTO DATA(ls_key) WITH KEY
+      name = 'NotificationNo'.
+    IF sy-subrc IS NOT INITIAL.
+      "handle errors here
+    ENDIF.
+
+    CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+      EXPORTING
+        input = ls_key-value
+      IMPORTING
+        output = er_entity-notif_no.
+
+    lv_timestamp = er_entity-malf_start_timestamp.
+    MOVE-CORRESPONDING er_entity TO ls_header.
+    CONVERT TIME STAMP lv_timestamp TIME ZONE lv_timezone
+      INTO DATE ls_header-strmlfndate.
+    CONVERT TIME STAMP lv_timestamp TIME ZONE lv_timezone
+      INTO TIME ls_header-strmlfntime.
+
+    ls_header_x-equipment = abap_true.
+    ls_header_x-funct_loc = abap_true.
+    ls_header_x-short_text = abap_true.
+    ls_header_x-priority = abap_true.
+    ls_header_x-breakdown = abap_true.
+    ls_header_x-coding = abap_true.
+    ls_header_x-reportedby = abap_true.
+    ls_header_x-strmlfndate = abap_true.
+    ls_header_x-strmlfntime = abap_true.
+
+    CALL FUNCTION 'BAPI_ALM_NOTIF_DATA_MODIFY'
+      EXPORTING
+        number = er_entity-notif_no
+        notifheader = ls_header
+        notifheader_x = ls_header_x
+      IMPORTING
+        notifheader_export = ls_header_ex
+      TABLES
+        return = lt_return.
+
+    READ TABLE lt_return INTO DATA(ls_return)
+      WITH KEY type = lc_err.
+    IF sy-subrc IS NOT INITIAL.
+      "handle error
+    ENDIF.
+
+    IF er_entity-long_text IS NOT INITIAL.
+      lv_longtext = er_entity-long_text.
+      lt_tline = me->alm_string_format( im_string = lv_longtext ).
+
+      CALL FUNCTION 'IQS0_ADD_NOTIFICATION_LONGTEXT'
+        EXPORTING
+          i_qmnum   = ls_header_ex-notif_no
+        TABLES
+          t_inlines = lt_tline.
+    ENDIF.
+
+"If status changed or some other major thing, handle it here.
+
+    CALL FUNCTION 'BAPI_ALM_NOTIF_SAVE'
+      EXPORTING
+        number      = ls_header_ex-notif_no
+      IMPORTING
+        notifheader = ls_header_ex.
+
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+      EXPORTING
+        wait = abap_true.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->PLANTSET_GET_ENTITY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IO_REQUEST_OBJECT              TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITY(optional)
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [<---] ER_ENTITY                      TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TS_PLANT
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method PLANTSET_GET_ENTITY.
+    DATA lv_werks TYPE t001w-werks.
+
+    READ TABLE it_key_tab INTO DATA(ls_key_tab) INDEX 1.
+    IF sy-subrc IS INITIAL.
+      lv_werks = ls_key_tab-value.
+      SELECT SINGLE werks name1 INTO CORRESPONDING FIELDS OF er_entity
+        FROM t001w
+       WHERE werks = lv_werks.
+    ENDIF.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_ZNOTIFICATION_DEMO_DPC_EXT->PLANTSET_GET_ENTITYSET
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_ENTITY_NAME                 TYPE        STRING
+* | [--->] IV_ENTITY_SET_NAME             TYPE        STRING
+* | [--->] IV_SOURCE_NAME                 TYPE        STRING
+* | [--->] IT_FILTER_SELECT_OPTIONS       TYPE        /IWBEP/T_MGW_SELECT_OPTION
+* | [--->] IS_PAGING                      TYPE        /IWBEP/S_MGW_PAGING
+* | [--->] IT_KEY_TAB                     TYPE        /IWBEP/T_MGW_NAME_VALUE_PAIR
+* | [--->] IT_NAVIGATION_PATH             TYPE        /IWBEP/T_MGW_NAVIGATION_PATH
+* | [--->] IT_ORDER                       TYPE        /IWBEP/T_MGW_SORTING_ORDER
+* | [--->] IV_FILTER_STRING               TYPE        STRING
+* | [--->] IV_SEARCH_STRING               TYPE        STRING
+* | [--->] IO_TECH_REQUEST_CONTEXT        TYPE REF TO /IWBEP/IF_MGW_REQ_ENTITYSET(optional)
+* | [<---] ET_ENTITYSET                   TYPE        ZCL_ZNOTIFICATION_DEMO_MPC=>TT_PLANT
+* | [<---] ES_RESPONSE_CONTEXT            TYPE        /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+* | [!CX!] /IWBEP/CX_MGW_BUSI_EXCEPTION
+* | [!CX!] /IWBEP/CX_MGW_TECH_EXCEPTION
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD plantset_get_entityset.
+    SELECT werks name1 INTO CORRESPONDING FIELDS OF TABLE et_entityset
+      FROM t001w
+     WHERE werks IN ( '0001', '1300', '5000', 'ZCBM' ).
+  ENDMETHOD.
+ENDCLASS.
