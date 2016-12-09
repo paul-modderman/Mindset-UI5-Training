@@ -17,18 +17,18 @@ If you're in class, we'll do this together as well. Play-at-home: follow along h
 ### ABAP ###
 + Set up a simple plant DDIC structure. 
 
-![alt text](https://link.to/my.picture "title text")
+![alt text](https://raw.githubusercontent.com/paul-modderman/Mindset-UI5-Training/master/Plant_Entity_DDIC.png "Plant Entity")
 
 + Set up a maintenance request DDIC structure. 
 
-![alt text](https://link.to/my.other.picture "title text")
+![alt text](https://raw.githubusercontent.com/paul-modderman/Mindset-UI5-Training/master/MaintRequest_Entity_DDIC.png "MaintRequest Entity")
 
 + Create a project in SEGW. 
 + Import the plant DDIC structure into an entity/entityset called Plant/PlantSet. 
 + Import the maintenance request DDIC structure into an entity/entityset called MaintRequest/MaintRequestSet. 
 + Set update/create settings on MaintRequest
 
-![alt text](https://link.to/my.third.picture "title text")
+![alt text](https://raw.githubusercontent.com/paul-modderman/Mindset-UI5-Training/master/MaintRequest_Entity_CREATE_UPDATE.png "Create/Update Settings")
 
 + Plug methods in from the ABAP class file in this project. ABAP doesn't have a great git in-out system, so you'll have to just pick apart the methods in the file. 
 + Activate the class, and generate and activate the project in SEGW. 
